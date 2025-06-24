@@ -1,10 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './userDashboard.css';
-import PopupForms1 from './popupform';
+import PopupForms from './popupform'; // ✅ Adjust the path if needed
 //import AssetCard from './AssetCard';
 
 const UserDashboard = () => {
+    const [evCount, setEvCount] = useState(0);
+useEffect(() => {
+  const fetchEVs = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/evmasterdata/${userId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        setEvData(result.data);
+        setEvCount(result.count); // 👈 Add this
+      } else {
+        console.error("Failed to fetch EVs");
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+
+  fetchEVs();
+}, []);
+
     const userData = localStorage.getItem("user");
     const user = userData ? JSON.parse(userData) : null;
 
@@ -27,7 +48,7 @@ const UserDashboard = () => {
 
     // Load all asset data on mount
     const fetchAssets = () => {
-        fetch('http://localhost:5006/api/ev')
+        fetch('http://localhost:8080/api/evmasterdata')
             .then(res => res.json())
             .then(setEvData)
             .catch(() => setEvData([]));
@@ -130,31 +151,36 @@ const UserDashboard = () => {
     return (
         <div className="dashboard-container">
 <div className="navbar">
-                <div className="flex items-center">
-                    <h2 className="logo">Carbon<span>Credit</span></h2>
-                </div>
+      <div className="navbar-left">
+        <h2 className="logo">
+          Carbon<span>Credit</span>
+        </h2>
+      </div>
 
-                <div className="navbar-right">
-                    <div className="notification-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <span className="notification-indicator"></span>
-                    </div>
+      <div className="navbar-right">
+        <div className="notification-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" className="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span className="notification-indicator"></span>
+        </div>
 
-                    <div className="user-profile">
-                        <div className="avatar">JS</div>
-                        <span className="username">John Smith</span>
-                    </div>
+        <div className="user-profile">
+          <div className="avatar">JS</div>
+          <span className="username">{user?.username || 'User'}</span>
 
-                    <button className="btn-secondary icon-button" onClick={handleButtonClick}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
+        </div>
+
+        <button className="btn-secondary icon-button" onClick={handleButtonClick}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </div> 
+
+    
           
             <div className="dashboard-content fade-in">
                 <div className="dashboard-header">
@@ -167,29 +193,29 @@ const UserDashboard = () => {
                 <div className="stats-grid">
                     <div className="stat-card">
                         <p className="stat-label">EV Mileage</p>
-                        <h4 className="stat-value">3,080 km</h4>
+                        <h4 className="stat-value">0 km</h4>
                         <div className="progress-bar">
-                            <div className="progress-fill" data-width="60%"></div>
+                            <div className="progress-fill" data-width="0%"></div>
                         </div>
-                        <p className="stat-subtitle">60% increase from last month</p>
+                        <p className="stat-subtitle">No assets</p>
                     </div>
 
                     <div className="stat-card">
                         <p className="stat-label">Trees Planted</p>
-                        <h4 className="stat-value">20</h4>
+                        <h4 className="stat-value">0 Trees</h4>
                         <div className="progress-bar">
-                            <div className="progress-fill" data-width="40%"></div>
+                            <div className="progress-fill" data-width="0%"></div>
                         </div>
-                        <p className="stat-subtitle">40% of yearly goal</p>
+                        <p className="stat-subtitle">No assets</p>
                     </div>
 
                     <div className="stat-card">
                         <p className="stat-label">Solar Panels Installed</p>
-                        <h4 className="stat-value">5</h4>
+                        <h4 className="stat-value">0 KWH</h4>
                         <div className="progress-bar">
-                            <div className="progress-fill" data-width="75%"></div>
+                            <div className="progress-fill" data-width="0%"></div>
                         </div>
-                        <p className="stat-subtitle">75% of yearly goal</p>
+                        <p className="stat-subtitle">No assets</p>
                     </div>
                 </div>
 
@@ -197,7 +223,8 @@ const UserDashboard = () => {
                     <div className="ev-section section-card fade-in" style={{ animationDelay: '0.2s' }}>
                         <div className="section-header">
                             <h2 className="section-title">Electric Vehicles</h2>
-                            <span className="badge"> {evData.length} Assets</span>
+                           <span className="badge">{evCount} Assets</span>
+
                         </div>
 
                         <div className="button-container">
@@ -214,11 +241,11 @@ const UserDashboard = () => {
                         <div className="section-stats">
                             <div className="stat-card mini">
                                 <p className="stat-label">Total Distance</p>
-                                <h5 className="stat-value">3,080 km</h5>
+                                <h5 className="stat-value">0 km</h5>
                             </div>
                             <div className="stat-card mini">
                                 <p className="stat-label">CO₂ Saved</p>
-                                <h5 className="stat-value">185 kg</h5>
+                                <h5 className="stat-value">0 kg</h5>
                             </div>
                         </div>
                     </div>
@@ -243,11 +270,11 @@ const UserDashboard = () => {
                         <div className="section-stats">
                             <div className="stat-card mini">
                                 <p className="stat-label">Total Trees</p>
-                                <h5 className="stat-value">20</h5>
+                                <h5 className="stat-value">0</h5>
                             </div>
                             <div className="stat-card mini">
                                 <p className="stat-label">CO₂ Absorbed</p>
-                                <h5 className="stat-value">120 kg</h5>
+                                <h5 className="stat-value">0 kg</h5>
                             </div>
                         </div>
                     </div>
@@ -272,79 +299,17 @@ const UserDashboard = () => {
                         <div className="section-stats">
                             <div className="stat-card mini">
                                 <p className="stat-label">Total Energy</p>
-                                <h5 className="stat-value">2,400 kWh</h5>
+                                <h5 className="stat-value">0 kWh</h5>
                             </div>
                             <div className="stat-card mini">
                                 <p className="stat-label">Electricity Bill Saved</p>
-                                <h5 className="stat-value">1500 Rupees</h5>
+                                <h5 className="stat-value">₹ 0</h5> 
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="card chart-card fade-in" style={{ animationDelay: '0.5s' }}>
-                    <div className="chart-header">
-                        <h2 className="section-title">Carbon Credit Trend</h2>
-                        <div className="chart-controls">
-                            <button className="btn-secondary chart-btn" onClick={handleButtonClick}>Week</button>
-                            <button className="btn-primary chart-btn" onClick={handleButtonClick}>Month</button>
-                            <button className="btn-secondary chart-btn" onClick={handleButtonClick}>Year</button>
-                        </div>
-                    </div>
-
-                    <div className="chart-container">
-                        <svg width="100%" height="100%" viewBox="0 0 800 200" preserveAspectRatio="none">
-                            <line x1="0" y1="0" x2="800" y2="0" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            <line x1="0" y1="50" x2="800" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                            <line x1="0" y1="200" x2="800" y2="200" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-
-                            <path d="M0,180 L100,160 L200,140 L300,150 L400,120 L500,100 L600,80 L700,70 L800,50" fill="none" stroke="#4f46e5" strokeWidth="3" />
-                            <path d="M0,190 L100,180 L200,170 L300,160 L400,150 L500,130 L600,110 L700,100 L800,90" fill="none" stroke="#9333ea" strokeWidth="3" />
-                            <path d="M0,185 L100,170 L200,160 L300,155 L400,140 L500,125 L600,100 L700,90 L800,85" fill="none" stroke="#f4bb44" strokeWidth="3" />
-
-                            <circle cx="0" cy="180" r="4" fill="#4f46e5" />
-                            <circle cx="100" cy="160" r="4" fill="#4f46e5" />
-                            <circle cx="200" cy="140" r="4" fill="#4f46e5" />
-                            <circle cx="300" cy="150" r="4" fill="#4f46e5" />
-                            <circle cx="400" cy="120" r="4" fill="#4f46e5" />
-                            <circle cx="500" cy="100" r="4" fill="#4f46e5" />
-                            <circle cx="600" cy="80" r="4" fill="#4f46e5" />
-                            <circle cx="700" cy="70" r="4" fill="#4f46e5" />
-                            <circle cx="800" cy="50" r="4" fill="#4f46e5" />
-
-                            <circle cx="0" cy="190" r="4" fill="#9333ea" />
-                            <circle cx="100" cy="180" r="4" fill="#9333ea" />
-                            <circle cx="200" cy="170" r="4" fill="#9333ea" />
-                            <circle cx="300" cy="160" r="4" fill="#9333ea" />
-                            <circle cx="400" cy="150" r="4" fill="#9333ea" />
-                            <circle cx="500" cy="130" r="4" fill="#9333ea" />
-                            <circle cx="600" cy="110" r="4" fill="#9333ea" />
-                            <circle cx="700" cy="100" r="4" fill="#9333ea" />
-                            <circle cx="800" cy="90" r="4" fill="#9333ea" />
-
-                            {[185, 170, 160, 155, 140, 125, 100, 90, 85].map((cy, i) => (
-                                <circle key={i + 20} cx={i * 100} cy={cy} r="4" fill="#f4bb44" />
-                            ))}
-                        </svg>
-                    </div>
-
-                    <div className="chart-legend">
-                        <div className="legend-item">
-                            <div className="legend-color ev"></div>
-                            <span className="legend-label">EV Credits</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color tree"></div>
-                            <span className="legend-label">Tree Credits</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color solar" style={{ backgroundColor: "#f4bb44" }}></div>
-                            <span className="legend-label">Solar Credits</span>
-                        </div>
-                    </div>
-                </div>
+              
 
                 <div className="history-card fade-in" style={{ animationDelay: '0.6s' }}>
                     <div className="history-header">
@@ -376,34 +341,6 @@ const UserDashboard = () => {
                                     <td className="credits">+15 CC</td>
                                     <td><button className="action-btn">View</button></td>
                                 </tr>
-                                <tr className="history-item">
-                                    <td>Jun 15, 2023</td>
-                                    <td><span className="history-badge tree">Tree</span></td>
-                                    <td>Pine Trees - Growth verification</td>
-                                    <td className="credits">+40 CC</td>
-                                    <td><button className="action-btn">View</button></td>
-                                </tr>
-                                <tr className="history-item">
-                                    <td>May 30, 2023</td>
-                                    <td><span className="history-badge ev">EV</span></td>
-                                    <td>Nissan Leaf - 980 km traveled</td>
-                                    <td className="credits">+12 CC</td>
-                                    <td><button className="action-btn">View</button></td>
-                                </tr>
-                                <tr className="history-item">
-                                    <td>May 15, 2023</td>
-                                    <td><span className="history-badge ev">EV</span></td>
-                                    <td>BMW i3 - 850 km traveled</td>
-                                    <td className="credits">+10 CC</td>
-                                    <td><button className="action-btn">View</button></td>
-                                </tr>
-                                <tr className="history-item">
-                                    <td>Apr 30, 2023</td>
-                                    <td><span className="history-badge tree">Tree</span></td>
-                                    <td>Oak Trees - Growth verification</td>
-                                    <td className="credits">+30 CC</td>
-                                    <td><button className="action-btn">View</button></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -432,7 +369,7 @@ const UserDashboard = () => {
                 </div>
             </div>
 
-            <PopupForms1
+            <PopupForms
                 activeEVPopup={activeEVPopup}
                 setActiveEVPopup={setActiveEVPopup}
                 activeSolarPopup={activeSolarPopup}
@@ -440,6 +377,7 @@ const UserDashboard = () => {
                 activeTreePopup={activeTreePopup}
                 setActiveTreePopup={setActiveTreePopup}
                 handleSaveEV={handleSaveEV}
+                setEvCount={setEvCount}
                 handleSaveTree={handleSaveTree}
                 handleSaveSolar={handleSaveSolar}
             />
