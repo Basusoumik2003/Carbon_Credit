@@ -6,22 +6,40 @@ const registerUser = async (req, res) => {
   const { username, email, password, role } = req.body;
 
   try {
-    // check if user exists
-    const existing = await pool.query("SELECT * FROM Carboncredit WHERE email = $1", [email]);
-    if (existing.rows.length > 0) return res.status(400).json({ message: "User already exists" });
+    // Check if user already exists
+    const existing = await pool.query("SELECT * FROM usertable WHERE email = $1", [email]);
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const carbonTokens = role === "user" ? 100 : 1000;
+
+    // Generate U_Id like 'USR0001'
+    const idResult = await pool.query("SELECT nextval(pg_get_serial_sequence('usertable', 'id')) AS next_id");
+    const nextId = idResult.rows[0].next_id;
+    const uId = `USR${nextId.toString().padStart(4, "0")}`;
+
+    const createDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
     const newUser = await pool.query(
-      `INSERT INTO Carboncredit (username, email, password, role, carbon_tokens, avatar, join_date)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
-      [username, email, hashedPassword, role, carbonTokens, "/placeholder.svg?height=32&width=32"]
+      `INSERT INTO usertable (u_id, username, email, password, role, create_date)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [uId, username, email, hashedPassword, role === "user" ? "U" : "O", createDate]
     );
 
-    const token = jwt.sign({ id: newUser.rows[0].id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: newUser.rows[0].id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    res.status(201).json({ user: newUser.rows[0], token });
+    res.status(201).json({
+      user: {
+        username: newUser.rows[0].username,
+        email: newUser.rows[0].email,
+        role: newUser.rows[0].role,
+        u_id: newUser.rows[0].u_id
+      },
+      token,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -31,16 +49,30 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const userQuery = await pool.query("SELECT * FROM Carboncredit WHERE email = $1", [email]);
-    if (userQuery.rows.length === 0) return res.status(400).json({ message: "User not found" });
+    const userQuery = await pool.query("SELECT * FROM usertable WHERE email = $1", [email]);
+    if (userQuery.rows.length === 0) {
+      return res.status(400).json({ message: "User not found" });
+    }
 
     const user = userQuery.rows[0];
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(401).json({ message: "Invalid credentials" });
+    if (!validPassword) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    res.json({ user, token });
+    res.json({
+      user: {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        u_id: user.u_id
+      },
+      token,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

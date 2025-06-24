@@ -6,14 +6,16 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-pool.connect()
+pool.query('SELECT 1')
   .then(() => console.log('✅ PostgreSQL connected'))
   .catch((err) => console.error('❌ PostgreSQL connection error:', err));
 
 module.exports = pool;
+
 
 // config/db.js
 // import pkg from 'pg';
