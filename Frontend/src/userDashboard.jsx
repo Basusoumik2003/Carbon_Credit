@@ -2,11 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './userDashboard.css';
 import PopupForms from './popupform'; // ✅ Adjust the path if needed
-//import AssetCard from './AssetCard';
+import AssetCard from './AssetCard';
+import { FaSolarPanel } from 'react-icons/fa';
 
 const UserDashboard = () => {
+
+    const userData = localStorage.getItem("user");
+const user = userData ? JSON.parse(userData) : null;
+
+if (!user) {
+  return (
+    <div className="error text-red-500 text-center p-4 bg-white rounded shadow">
+      User not found. Please log in again.
+    </div>
+  );
+}
+
+const userId = user.u_id;
+const [solarCount, setSolarCount] = useState(0);
+
     const [evCount, setEvCount] = useState(0);
 useEffect(() => {
+  if (!userId) return; // protect against undefined
+
   const fetchEVs = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/evmasterdata/${userId}`);
@@ -14,7 +32,7 @@ useEffect(() => {
 
       if (result.status === 'success') {
         setEvData(result.data);
-        setEvCount(result.count); // 👈 Add this
+        setEvCount(result.count); // ✅ Will now run on load if userId is defined
       } else {
         console.error("Failed to fetch EVs");
       }
@@ -24,12 +42,33 @@ useEffect(() => {
   };
 
   fetchEVs();
-}, []);
+}, [userId]); // ✅ Depend on userId
 
-    const userData = localStorage.getItem("user");
-    const user = userData ? JSON.parse(userData) : null;
 
-    if (!user) return <div className="error text-red-500 text-center p-4 bg-white rounded shadow">User not found. Please log in again.</div>;
+
+useEffect(() => {
+  if (!userId) return; // ✅ Ensure userId is available
+
+  const fetchSolarPanels = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/solarpanel/${userId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        setSolarData(result.data);        
+        setSolarCount(result.count);      
+      } else {
+        console.error("Failed to fetch solar panels");
+      }
+    } catch (err) {
+      console.error("Solar panel fetch error:", err);
+    }
+  };
+
+  fetchSolarPanels();
+}, [userId]); // ✅ Depend on userId
+
+
 
     const [activeEVPopup, setActiveEVPopup] = useState(false);
     const [activeSolarPopup, setActiveSolarPopup] = useState(false);
@@ -282,7 +321,8 @@ useEffect(() => {
                     <div className="solar-section section-card fade-in" style={{ animationDelay: '0.4s' }}>
                         <div className="section-header">
                             <h2 className="section-title">Solar Panels</h2>
-                            <span className="badge"> {solarData.length} Assets</span>
+                            <AssetCard title="Solar Panels" value={solarCount} icon={<FaSolarPanel />} color="#FF9800" />
+
                         </div>
 
                         <div className="button-container">
@@ -377,6 +417,7 @@ useEffect(() => {
                 activeTreePopup={activeTreePopup}
                 setActiveTreePopup={setActiveTreePopup}
                 handleSaveEV={handleSaveEV}
+                setSolarCount={setSolarCount}
                 setEvCount={setEvCount}
                 handleSaveTree={handleSaveTree}
                 handleSaveSolar={handleSaveSolar}

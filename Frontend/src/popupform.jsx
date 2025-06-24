@@ -2,16 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import './popupform.css';
 const PopupForms = ({
-  activeEVPopup,
-  setActiveEVPopup,
-  activeSolarPopup,
-  setActiveSolarPopup,
-  activeTreePopup,
-  setActiveTreePopup,
-  handleSaveEV,
-  handleSaveTree,
-  handleSaveSolar,
-  setEvCount, // ✅ Add this line!
+    activeEVPopup,
+    setActiveEVPopup,
+    activeSolarPopup,
+    setActiveSolarPopup,
+    activeTreePopup,
+    setActiveTreePopup,
+    handleSaveEV,
+    handleSaveTree,
+    handleSaveSolar,
+    setEvCount,
+    setSolarCount // ✅ Add this line!
 }) => {
 
 
@@ -31,18 +32,18 @@ const PopupForms = ({
 
 
 
-    const [solarPanelData, setSolarPanelData] = useState({
-        manufacturer: '',
-        model: '',
-        capacity: '',
-        installationDate: '',
-        orientation: 'south',
-        tiltAngle: '',
-        efficiency: '',
-        area: '',
-        inverterType: 'string',
-        maintenanceDate: ''
-    });
+   const [solarPanelData, setSolarPanelData] = useState({
+  Installed_Capacity: '',
+  Installation_Date: '',
+  Energy_Generation_Value: '',
+  Energy_Generation: 'Monthly',
+  Grid_Emission_Factor: '',
+  Inverter_Type: 'string',
+  Panel_Efficiency: ''
+});
+
+
+
     const [evData, setEVData] = useState({
         manufacturer: '',
         model: '',
@@ -95,93 +96,123 @@ const PopupForms = ({
     };
 
 
-    const handleSolarSubmit = async (e) => {
+  const handleSolarSubmit = async (e) => {
+    e.preventDefault();
+
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const U_ID = storedUser?.u_id;
+
+    if (!U_ID) {
+        showToast('User not logged in', 'error');
+        return;
+    }
+
+    const payload = {
+        SUID: crypto.randomUUID(),
+        U_ID,
+        Installed_Capacity: solarPanelData.Installed_Capacity,
+        Installation_Date: solarPanelData.Installation_Date,
+        Energy_Generation_Value: Number(solarPanelData.Energy_Generation_Value),
+        Energy_Generation: solarPanelData.Energy_Generation, // Should be "Monthly" or "Yearly"
+        Grid_Emission_Factor: Number(solarPanelData.Grid_Emission_Factor),
+        Inverter_Type: solarPanelData.Inverter_Type,
+        Panel_Efficiency: Number(solarPanelData.Panel_Efficiency),
+    };
+
+    // ✅ Debug log
+    console.log('Submitting Solar Panel Payload:', payload);
+
+    // ✅ Quick client-side validation
+    const missingFields = Object.entries(payload).filter(([_, val]) =>
+        val === undefined || val === null || val === '' || (typeof val === 'string' && val.trim() === '')
+    );
+
+    if (missingFields.length > 0) {
+        showToast(`Missing fields: ${missingFields.map(f => f[0]).join(', ')}`, 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/api/solarpanel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+            const { data: savedSolar, solarCount } = await response.json();
+            setSolarCount(solarCount);
+            showToast(`Solar Panel saved! Total: ${solarCount}`, 'success');
+            handleSaveSolar(savedSolar);
+            setActiveSolarPopup(false);
+        } else {
+            const err = await response.json();
+            showToast('Failed: ' + (err.message || 'Unknown error'), 'error');
+        }
+    } catch (err) {
+        showToast('Server error: ' + err.message, 'error');
+    }
+};
+
+
+
+    const handleEVSubmit = async (e) => {
         e.preventDefault();
 
+        // 🔑 Get the logged-in user from localStorage
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const U_ID = storedUser?.u_id;
+
+        if (!U_ID) {
+            showToast('User not logged in or invalid session', 'error');
+            return;
+        }
+
+        // 📦 Construct payload
         const payload = {
-            ...solarPanelData,
-            addedDate: new Date().toISOString().split('T')[0],
-            carbonCredits: Number(solarPanelData.carbonCredits) || 0
+            VUID: crypto.randomUUID(), // Generate unique VUID on frontend
+            U_ID,
+            Category: evData.EVCategory,
+            Manufacturers: evData.manufacturer,
+            Model: evData.model,
+            Purchase_Year: Number(evData.year),
+            Energy_Consumed: Number(evData.batteryconsumed),
+            Primary_Charging_Type: evData.chargingType,
+            Range: Number(evData.range),
+            Grid_Emission_Factor: Number(evData.gridEmissionFactor),
+            Top_Speed: evData.topSpeed ? Number(evData.topSpeed) : null,
+            Charging_Time: evData.chargingTime ? Number(evData.chargingTime) : null,
+            Motor_Power: evData.motorpower || null
         };
 
         try {
-            const response = await fetch('http://localhost:5006/api/solar', {
+            const response = await fetch('http://localhost:8080/api/evmasterdata', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
-                showToast('Solar panel saved to database!', 'success');
-                setActiveSolarPopup(false);
+                const { data: savedEV, evCount } = await response.json();
+
+                // ✅ Only call if it's a valid function
+                if (typeof setEvCount === 'function') {
+                    setEvCount(evCount);
+                }
+
+                showToast(`EV saved! Total EVs: ${evCount}`, 'success');
+                handleSaveEV(savedEV);
+                setActiveEVPopup(false); // Close the popup
             } else {
-                showToast('Failed to save solar panel.', 'error');
+                const errMsg = await response.text();
+                console.error("EV submit failed:", errMsg);
+                showToast('Failed to save EV: ' + errMsg, 'error');
             }
         } catch (error) {
-            console.error(error);
-            showToast('Server error!', 'error');
+            console.error("EV submit error:", error);
+            showToast('Server error! ' + error.message, 'error');
         }
     };
-
-
-
-  const handleEVSubmit = async (e) => {
-  e.preventDefault();
-
-  // 🔑 Get the logged-in user from localStorage
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  const U_ID = storedUser?.u_id;
-
-  if (!U_ID) {
-    showToast('User not logged in or invalid session', 'error');
-    return;
-  }
-
-  // 📦 Construct payload
-  const payload = {
-    VUID: crypto.randomUUID(), // Generate unique VUID on frontend
-    U_ID,
-    Category: evData.EVCategory,
-    Manufacturers: evData.manufacturer,
-    Model: evData.model,
-    Purchase_Year: Number(evData.year),
-    Energy_Consumed: Number(evData.batteryconsumed),
-    Primary_Charging_Type: evData.chargingType,
-    Range: Number(evData.range),
-    Grid_Emission_Factor: Number(evData.gridEmissionFactor),
-    Top_Speed: evData.topSpeed ? Number(evData.topSpeed) : null,
-    Charging_Time: evData.chargingTime ? Number(evData.chargingTime) : null,
-    Motor_Power: evData.motorpower || null
-  };
-
-  try {
-    const response = await fetch('http://localhost:8080/api/evmasterdata', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (response.ok) {
-      const { data: savedEV, evCount } = await response.json();
-
-      // ✅ Only call if it's a valid function
-      if (typeof setEvCount === 'function') {
-        setEvCount(evCount);
-      }
-
-      showToast(`EV saved! Total EVs: ${evCount}`, 'success');
-      handleSaveEV(savedEV);
-      setActiveEVPopup(false); // Close the popup
-    } else {
-      const errMsg = await response.text();
-      console.error("EV submit failed:", errMsg);
-      showToast('Failed to save EV: ' + errMsg, 'error');
-    }
-  } catch (error) {
-    console.error("EV submit error:", error);
-    showToast('Server error! ' + error.message, 'error');
-  }
-};
 
 
 
@@ -380,7 +411,7 @@ const PopupForms = ({
                                     required
                                 />
                             </div>
-                           <div className="form-group">
+                            <div className="form-group">
                                 <label htmlFor="gridEmissionFactor">Grid Emission Factor</label>
                                 <input
                                     type="number"
@@ -396,10 +427,10 @@ const PopupForms = ({
                         </div>
 
 
-       
+
 
                         <div className="form-row">
-                           
+
                             <div className="form-group">
                                 <label htmlFor="topSpeed">Top Speed</label>
                                 <input
@@ -426,7 +457,7 @@ const PopupForms = ({
                                     required
                                 />
                             </div>
-                              <div className="form-group">
+                            <div className="form-group">
                                 <label htmlFor="motorpower">Motor power</label>
                                 <input
                                     type="number"
@@ -439,7 +470,7 @@ const PopupForms = ({
                                     required
                                 />
                             </div>
-                                
+
 
                         </div>
 
@@ -469,7 +500,7 @@ const PopupForms = ({
                         <button className="popup-close" onClick={() => setActiveTreePopup(false)}>×</button>
                     </div>
                     <form onSubmit={handleTreeSubmit}>
-                        
+
                         <div className="form-row">
                             <div className="form-group">
                                 <label htmlFor="TreeName">Tree Name</label>
@@ -484,7 +515,7 @@ const PopupForms = ({
                                 />
                             </div>
 
-                             <div className="form-group">
+                            <div className="form-group">
                                 <label htmlFor="species">Tree Species</label>
                                 <input
                                     type="text"
@@ -507,34 +538,34 @@ const PopupForms = ({
                                     required
                                 />
                             </div>
-                            
-                              <div className="form-group">
+
+                            <div className="form-group">
                                 <label htmlFor="DBH">DBH (Diameter at breast height)</label>
                                 <input
                                     type="number"
                                     id="plantingDate"
                                     className="form-control"
-                                     placeholder="e.g.,In CM "
+                                    placeholder="e.g.,In CM "
                                     value={treeData.plantingDate}
                                     onChange={(e) => setTreeData({ ...treeData, plantingDate: e.target.value })}
                                     required
                                 />
                             </div>
-                           
-                             <div className="form-group">
+
+                            <div className="form-group">
                                 <label htmlFor="Height">Height</label>
                                 <input
                                     type="number"
                                     id="Height"
                                     className="form-control"
-                                     placeholder="e.g.,In CM "
+                                    placeholder="e.g.,In CM "
                                     value={treeData.Height}
                                     onChange={(e) => setTreeData({ ...treeData, Height: e.target.value })}
                                     required
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="location">Location Description</label>
                             <input
@@ -614,83 +645,89 @@ const PopupForms = ({
                     <form onSubmit={handleSolarSubmit}>
                         <div className="form-row">
                             <div className="form-group">
-                                <label htmlFor="InstalledCapacity">Installed Capacity</label>
+                                <label htmlFor="Installed_Capacity">Installed Capacity</label>
                                 <input
                                     type="text"
-                                    id="InstalledCapacity"
+                                    id="Installed_Capacity"
                                     className="form-control"
                                     placeholder="e.g., 3kw"
-                                    value={solarPanelData.InstalledCapacity}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData,InstalledCapacity: e.target.value })}
+                                    value={solarPanelData.Installed_Capacity}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Installed_Capacity: e.target.value })}
                                     required
                                 />
                             </div>
-                       <div className="form-group">
-                                <label htmlFor="InstallationDate">Installation Date</label>
+                            <div className="form-group">
+                                <label htmlFor="Installation_Date">Installation_Date</label>
                                 <input
                                     type="date"
-                                    id="InstallationDate"
+                                    id="Installation_Date"
                                     className="form-control"
                                     placeholder="e.g., 3kw"
-                                    value={solarPanelData.InstallationDate}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, InstallationDate: e.target.value })}
+                                    value={solarPanelData.Installation_Date}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Installation_Date: e.target.value })}
                                     required
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="form-row">
-                               <div className="form-group">
-                                <label htmlFor="EnergyGeneration">Energy Generation</label>
+                            <div className="form-group">
+                                <label htmlFor="Energy_Generation">Energy_Generation</label>
                                 <select
-                                    id="EnergyGeneration"
+                                    id="Energy_Generation"
                                     className="form-control"
-                                    value={solarPanelData.EnergyGeneration}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, EnergyGeneration: e.target.value })}
+                                    value={solarPanelData.Energy_Generation}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Energy_Generation: e.target.value })}
                                     required
                                 >
                                     <option value="Monthly">Monthly</option>
                                     <option value="Yearly">Yearly</option>
-                                
-            
+
+
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="EnergyGenerationValue">Energy Generation Value</label>
+                                <label htmlFor="Energy_Generation_Value">Energy Generation Value</label>
                                 <input
                                     type="number"
-                                    id="EnergyGenerationValue"
+                                    id="Energy_Generation_Value"
                                     className="form-control"
                                     placeholder="e.g., 3kw"
-                                    value={solarPanelData.EnergyGenerationValue}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, EnergyGenerationValue: e.target.value })}
-                                    required
-                                />
-                            </div>
-                           
-                        </div>
-                        <div className="form-row">
-                    
-                            <div className="form-group">
-                                <label htmlFor="GridEmissionFactor">Grid Emission Factor</label>
-                                <input
-                                    type="number"
-                                    id="GridEmissionFactor"
-                                    className="form-control"
-                                    placeholder="e.g., 30"
-                                    value={solarPanelData.GridEmissionFactor}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, GridEmissionFactor: e.target.value })}
+                                    value={solarPanelData.Energy_Generation_Value}
+                                    onChange={(e) =>
+                                        setSolarPanelData({
+                                            ...solarPanelData,
+                                            Energy_Generation_Value: e.target.value
+                                        })
+                                    }
                                     required
                                 />
                             </div>
 
-                             <div className="form-group">
-                                <label htmlFor="inverterType">Inverter Type</label>
-                                <select
-                                    id="inverterType"
+
+                        </div>
+                        <div className="form-row">
+
+                            <div className="form-group">
+                                <label htmlFor="Grid_Emission_Factor">Grid_Emission_Factor</label>
+                                <input
+                                    type="number"
+                                    id="Grid_Emission_Factor"
                                     className="form-control"
-                                    value={solarPanelData.inverterType}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, inverterType: e.target.value })}
+                                    placeholder="e.g., 30"
+                                    value={solarPanelData.Grid_Emission_Factor}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Grid_Emission_Factor: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="Inverter_Type">Inverter_Type</label>
+                                <select
+                                    id="Inverter_Type"
+                                    className="form-control"
+                                    value={solarPanelData.Inverter_Type}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Inverter_Type: e.target.value })}
                                     required
                                 >
                                     <option value="string">String Inverter</option>
@@ -702,25 +739,25 @@ const PopupForms = ({
                         </div>
                         <div className="form-row">
                             <div className="form-group">
-                                <label htmlFor="efficiency">Panel Efficiency (%)</label>
+                                <label htmlFor="Panel_Efficiency">Panel_Efficiency (%)</label>
                                 <input
                                     type="number"
-                                    id="efficiency"
+                                    id="Panel_Efficiency"
                                     className="form-control"
                                     placeholder="e.g., 22.5"
                                     step="0.1"
                                     min="1"
                                     max="100"
-                                    value={solarPanelData.efficiency}
-                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, efficiency: e.target.value })}
+                                    value={solarPanelData.Panel_Efficiency}
+                                    onChange={(e) => setSolarPanelData({ ...solarPanelData, Panel_Efficiency: e.target.value })}
                                     required
                                 />
                             </div>
-                
+
                         </div>
                         <div className="form-row">
-                           
-                           
+
+
                         </div>
                         <div className="form-actions">
                             <button type="button" className="btn-primary btn-cancel" onClick={() => setActiveSolarPopup(false)}>Cancel</button>

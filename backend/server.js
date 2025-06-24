@@ -35,6 +35,8 @@ const app = express();
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
+const solarRoutes = require('./routes/solar');
+app.use('/api/solarpanel', solarRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/evmasterdata', evRoutes); // ✅ Mount here
