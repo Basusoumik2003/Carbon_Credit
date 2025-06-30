@@ -66,7 +66,6 @@ const OrgDashboard = () => {
             <p>5,400</p>
           </div>
         </section>
-
         <section className="charts-tables">
           <div className="chart">
             <h3>Emissions Trend</h3>

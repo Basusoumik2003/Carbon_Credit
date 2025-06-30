@@ -1,0 +1,140 @@
+.upload-sections-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+/* Each Card */
+.upload-section-card {
+  flex: 1 1 30%;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0;
+  animation: fadeInUpload 0.6s forwards;
+}
+
+.upload-section-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeInUpload {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Header and Title */
+.upload-section-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.upload-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+.upload-button-container {
+  margin-bottom: 16px;
+}
+
+.upload-btn {
+  background-color: #42a5f5;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.upload-btn:hover {
+  background-color: #1e88e5;
+  transform: translateY(-2px);
+}
+
+.upload-btn-secondary {
+  background-color: #ab47bc;
+}
+
+.upload-btn-secondary:hover {
+  background-color: #8e24aa;
+}
+
+.upload-btn-tertiary {
+  background-color: #26a69a;
+}
+
+.upload-btn-tertiary:hover {
+  background-color: #00897b;
+}
+
+.upload-pulse {
+  animation: pulseUpload 1.6s infinite;
+}
+
+@keyframes pulseUpload {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.upload-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Stats */
+.upload-section-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.upload-stat-card {
+  flex: 1 1 120px;
+  background: linear-gradient(135deg, #ffe082, #ffcc80);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.upload-stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.upload-stat-label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.upload-stat-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Responsive Layout */
+@media (max-width: 960px) {
+  .upload-section-card {
+    flex: 1 1 100%;
+  }
+}

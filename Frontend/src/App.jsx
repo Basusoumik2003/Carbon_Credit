@@ -1493,20 +1493,39 @@
 // }
 // src/App.jsx
 // src/App.jsx
-import { Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './Home';
 import UserDashboard from './userDashboard';
 import OrgDashboard from './orgDashboard';
+import Upload from './upload';
+import Blog from './blog';
+import Engage from './engage';
+import Wallet from './wallet';
+import Profile from './profile';
+import UserNavbar from './userNavbar';
 
+const App = () => {
+  const location = useLocation();
 
-function App() {
+  const hideNavbarRoutes = ['/', '/userDashboard', '/orgDashboard'];
+  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-     <Route path="/userDashboard" element={<UserDashboard />} />
-  <Route path="/orgDashboard" element={<OrgDashboard />} />
-    </Routes>
+    <>
+      {!shouldHideNavbar && <UserNavbar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/userDashboard" element={<UserDashboard />} />
+        <Route path="/orgDashboard" element={<OrgDashboard />} />
+        <Route path="/upload" element={<Upload />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/engage" element={<Engage />} />
+        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;

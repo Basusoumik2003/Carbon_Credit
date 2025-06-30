@@ -1,0 +1,89 @@
+.wallet-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #e1f5fe);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.wallet-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.wallet-card h2 {
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  color: #00796b;
+}
+
+.wallet-subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.connect-btn {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.connect-btn:hover {
+  background-color: #f57c00;
+}
+
+.wallet-info {
+  background-color: #f1f8e9;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: #33691e;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.buy-btn,
+.sell-btn {
+  flex: 1;
+  padding: 0.8rem;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.buy-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.sell-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.buy-btn:hover,
+.sell-btn:hover {
+  transform: scale(1.05);
+}

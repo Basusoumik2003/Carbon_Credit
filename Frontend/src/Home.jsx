@@ -1,163 +1,209 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
+import Login from './Login';
+import Signup from './Signup';
 import './Home.css';
-import { useState } from 'react';
-import Login from './Login'; // If Login.jsx is inside src/
-import Signup from "./Signup"
-import { useNavigate } from 'react-router-dom';
 
+const features = [
+  {
+    iconUrl: 'https://i.pinimg.com/474x/9e/8d/5e/9e8d5e07eed22f3364b0064a2bbb4dbf.jpg',
+    title: 'Risk Management',
+    desc: `Comprehensive risk assessment and mitigation strategies for your carbon portfolio investments.`,
+  },
+  {
+    iconUrl: 'https://img.favpng.com/3/25/18/chart-graph-of-a-function-infographic-information-png-favpng-Me2vt9rFvHtWhUjADqmVynUhq.jpg',
+    title: 'Advanced Analytics',
+    desc: 'Sophisticated data analytics and reporting tools to track your carbon reduction progress and ROI metrics',
+  },
+  {
+    iconUrl: 'https://cdn.vectorstock.com/i/500p/20/58/vegan-world-logo-globe-leaf-vector-27912058.jpg',
+    title: 'Global Portfolio',
+    desc: 'Access to premium carbon offset projects across 50+ countries, with institutional-grade verification and transparency',
+  },
+];
 
-
-const Home = () => {
+const Home = ({ isAuthenticated, user }) => {
   const navigate = useNavigate();
-    const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  const handleLoginClick = () => setShowLogin(true);
-  const handleSignupClick = () => setShowSignup(true);
+  const [featureIndex, setFeatureIndex] = useState(0);
+  const [nextIndex, setNextIndex] = useState(null);
+  const [transitioning, setTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState('right');
+
+  const handleGetStarted = () => {
+    setShowLogin(true);
+  };
+
+  const doSlide = (direction) => {
+    if (transitioning) return;
+    setSlideDirection(direction);
+    setTransitioning(true);
+    setNextIndex(
+      direction === 'right'
+        ? (featureIndex + 1) % features.length
+        : (featureIndex - 1 + features.length) % features.length
+    );
+    setTimeout(() => {
+      setFeatureIndex(
+        direction === 'right'
+          ? (featureIndex + 1) % features.length
+          : (featureIndex - 1 + features.length) % features.length
+      );
+      setTransitioning(false);
+      setNextIndex(null);
+    }, 500);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      doSlide('right');
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [featureIndex, transitioning]);
+
   const closeModal = () => {
     setShowLogin(false);
-    setShowSignup(false);};
+    setShowSignup(false);
+  };
+
   return (
-
-    
-    <div className="home">
-      <nav className="navbar">
-        <div className="logo">
-          🌱 <span>Carbon Credit</span>
-        </div>
-        <ul className="nav-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/">Community</a></li>
-        </ul>
-        <div className="auth-buttons">
-  <button className="login" onClick={handleLoginClick}>Login</button>
-  <button className="signup" onClick={handleSignupClick}>Sign Up</button>
-</div>
-{showLogin && (
-  <Login
-  onClose={closeModal}
-  onLogin={(userData) => {
-    localStorage.setItem("user", JSON.stringify(userData)); // optional: store login info
-    closeModal(); // close the modal
-
-    // ✅ Redirect based on role
-    if (userData.role === "organization") {
-      navigate("/orgDashboard");
-    } else {
-      navigate("/userDashboard");
-    }
-  }}
-  onSwitchToSignup={() => {
-    setShowLogin(false);
-    setShowSignup(true);
-  }}
+    <>
+      <Navbar
+  isAuthenticated={isAuthenticated}
+  user={user}
+  showAuth={showLogin || showSignup}
+  openLoginPopup={() => setShowLogin(true)}
+  openSignupPopup={() => setShowSignup(true)}
 />
 
-)}
 
-{showSignup && (
-  <Signup
-    onClose={closeModal}
-    onSwitchToLogin={() => {
-      setShowSignup(false);
-      setShowLogin(true);
-    }}
-  />
-)}
-
-      </nav>
-
-      <header className="hero-section">
-        <h1>
-          Transform Your <span>Carbon Footprint</span> <br /> Into Digital Assets
-        </h1>
-        <p>
-          Join the revolution of sustainable living. Earn carbon credits by using electric vehicles,
-          planting trees, and installing solar panels. Turn your eco-friendly actions into
-          blockchain-verified tokens.
-        </p>
-        <div className="cta-buttons">
-          <button className="primary">Start Earning Credits</button>
-          <button className="secondary">Learn How It Works</button>
-        </div>
-      </header>
-
-      <section className="stats">
-        <div>
-          <h2>50M+</h2>
-          <p>Tons of CO2 Offset</p>
-        </div>
-        <div>
-          <h2>100K+</h2>
-          <p>Active Users</p>
-        </div>
-        <div>
-          <h2>1M+</h2>
-          <p>Trees Planted</p>
-        </div>
-      </section>
-
-      <section className="how-it-works">
-        <h2>How Carbon Credits Work</h2>
-        <p>Simple steps to start earning and trading carbon credits through sustainable actions</p>
-        <div className="steps">
-          <div className="step">
-            <div className="number">1</div>
-            <div className="icon">🚗</div>
-            <h3>Use Electric Vehicles</h3>
-            <p>Drive electric cars, bikes, or use public transport. Every mile counts toward reducing emissions.</p>
+      <div className="hero-section">
+        <div className="container">
+          <div className="hero-layout">
+            <div className="hero-content">
+              <h1>Building a Sustainable Future</h1>
+              <p>
+                Join us in creating a better world through sustainable development practices and
+                environmental consciousness.
+              </p>
+              <div className="hero-buttons">
+                <button className="btn btn-white" onClick={handleGetStarted}>Get Started</button>
+                <Link to="/about" className="btn btn-secondary">Learn More</Link>
+              </div>
+            </div>
+            <div className="hero-image">
+              <div className="image-container">
+                <img
+                  src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"
+                  alt="Sustainable Future"
+                />
+              </div>
+            </div>
           </div>
-          <div className="step">
-            <div className="number">2</div>
-            <div className="icon">🌳</div>
-            <h3>Plant Trees</h3>
-            <p>Each tree absorbs CO2 and generates verified carbon credits over time.</p>
-          </div>
-          <div className="step">
-            <div className="number">3</div>
-            <div className="icon">🌞</div>
-            <h3>Install Solar Panels</h3>
-            <p>Generate clean energy and earn credits from excess energy production.</p>
-          </div>
-          <div className="step">
-            <div className="number">4</div>
-            <div className="icon">💰</div>
-            <h3>Earn & Trade</h3>
-            <p>Trade accumulated carbon credits on our blockchain-powered marketplace.</p>
+        </div>
+      </div>
+
+      <section className="features-section">
+        <div className="container">
+          <h2 className="section-title">Why Choose Sustainable Development?</h2>
+          <p className="features-subtitle">
+            Explore our core values and the impact we strive to make for a greener tomorrow.
+          </p>
+          <div className="features-inline">
+            {features.map((feature, idx) => (
+              <div className="feature-card professional-feature-card" key={idx}>
+                <div className="feature-icon professional-feature-icon">
+                  <img
+                    src={feature.iconUrl}
+                    alt={`${feature.title} icon`}
+                    className="realistic-feature-icon"
+                  />
+                </div>
+                <h3 className="professional-feature-title">{feature.title}</h3>
+                <p className="professional-feature-desc">{feature.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <footer className="footer">
-        <div className="footer-section brand">
-          <div className="footer-logo">🌱 Carbon Credit</div>
-          <p>Making sustainability profitable and accessible for everyone.</p>
-        </div>
-        <div className="footer-section">
-          <h4>Platform</h4>
-          <ul>
-            <li>Dashboard</li>
-            <li>Community</li>
-            <li>Marketplace</li>
-          </ul>
-        </div>
-        <div className="footer-section">
-          <h4>Resources</h4>
-          <ul>
-            <li>About Carbon Credits</li>
-            <li>Help Center</li>
-            <li>API Documentation</li>
-          </ul>
-        </div>
-        <div className="footer-section">
-          <h4>Connect</h4>
-          <div className="socials">🐦 💼 🐙</div>
-        </div>
-        <div className="copyright">
-          © 2024 Carbon Credit Platform. All rights reserved.
+      <footer className="page-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>Quick Links</h4>
+              <ul className="footer-links">
+                <li><Link to="/">Home</Link></li>
+                <li><Link to="/about">About</Link></li>
+              </ul>
+            </div>
+            <div className="footer-section">
+              <h4>Legal</h4>
+              <ul className="footer-links">
+                <li><Link to="/privacy">Privacy Policy</Link></li>
+                <li><Link to="/terms">Terms & Conditions</Link></li>
+                <li><Link to="/cookies">Cookie Policy</Link></li>
+                <li><Link to="/disclaimer">Disclaimer</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <div className="footer-bottom-content">
+              <div className="footer-social-inline">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="social-link">
+                  <i className="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="social-link">
+                  <i className="fab fa-twitter"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="social-link">
+                  <i className="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-link">
+                  <i className="fab fa-instagram"></i>
+                </a>
+              </div>
+              <p className="footer-copyright">
+                &copy; 2025 CarbonCredit. All rights reserved.
+              </p>
+            </div>
+          </div>
         </div>
       </footer>
-    </div>
+
+      {/* Auth Modals */}
+      {showLogin && (
+        <Login
+          onClose={closeModal}
+          onLogin={(userData) => {
+            localStorage.setItem('user', JSON.stringify(userData));
+            closeModal();
+            if (userData.role === 'organization') {
+              navigate('/orgDashboard');
+            } else {
+              navigate('/userDashboard');
+            }
+          }}
+          onSwitchToSignup={() => {
+            setShowLogin(false);
+            setShowSignup(true);
+          }}
+        />
+      )}
+
+      {showSignup && (
+        <Signup
+          onClose={closeModal}
+          onSwitchToLogin={() => {
+            setShowSignup(false);
+            setShowLogin(true);
+          }}
+        />
+      )}
+    </>
   );
 };
 

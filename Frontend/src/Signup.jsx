@@ -7,7 +7,7 @@ const Signup = ({ onClose, onSwitchToLogin }) => {
     username: "",
     email: "",
     password: "",
-    role: "user", // default role
+    role: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,6 @@ const Signup = ({ onClose, onSwitchToLogin }) => {
         return;
       }
 
-      // ✅ Save token and user/org to localStorage
       localStorage.setItem("token", data.token);
 
       if (data.user.role === "organization") {
@@ -50,7 +49,6 @@ const Signup = ({ onClose, onSwitchToLogin }) => {
       }
 
       if (onClose) onClose();
-
     } catch (err) {
       setError({ general: "Server error. Please try again later." });
     } finally {
@@ -63,30 +61,10 @@ const Signup = ({ onClose, onSwitchToLogin }) => {
       <div className="modal signup-modal">
         <div className="modal-header">
           <h2>Create Account</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
 
         <form onSubmit={handleSubmit} className="signup-form">
-          <div className="role-selector">
-            {["user", "organization"].map((role) => (
-              <label key={role} className="role-option">
-                <input
-                  type="radio"
-                  name="role"
-                  value={role}
-                  checked={formData.role === role}
-                  onChange={handleChange}
-                />
-                <div className="role-card">
-                  <span className="role-icon">{role === "user" ? "👤" : "🏢"}</span>
-                  <span className="role-title">
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </span>
-                </div>
-              </label>
-            ))}
-          </div>
-
           <div className="form-group">
             <label>Username</label>
             <input
@@ -124,6 +102,23 @@ const Signup = ({ onClose, onSwitchToLogin }) => {
               placeholder="Enter a password"
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label>Register as</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="input"
+              required
+            >
+              <option value="" disabled hidden>
+                Select your role
+              </option>
+              <option value="user">Private</option>
+              <option value="organization">Organization</option>
+            </select>
           </div>
 
           {error.general && <p className="error-text">{error.general}</p>}

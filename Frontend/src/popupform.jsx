@@ -50,7 +50,8 @@ const PopupForms = ({
         year: '',
         batteryCapacity: '',
         range: '',
-        chargingType: 'level2',
+        EVCategory:'',
+        chargingType: '',
         averageMileage: '',
         homeCharging: 'yes',
         publicCharging: 'sometimes',
@@ -300,6 +301,9 @@ const PopupForms = ({
                                     onChange={(e) => setEVData({ ...evData, EVCategory: e.target.value })}
                                     required
                                 >
+                                    <option value="" disabled hidden>
+            -- Select Vehicle Category --
+        </option>
                                     <option value="Two-Wheelers">Two-Wheelers</option>
                                     <option value="Three-Wheeler">Three-Wheeler </option>
                                     <option value="Hatchbacks">Hatchbacks</option>
@@ -387,6 +391,9 @@ const PopupForms = ({
                                     onChange={(e) => setEVData({ ...evData, chargingType: e.target.value })}
                                     required
                                 >
+                                    <option value="" disabled hidden>
+                                            -- Select Charging Type --
+                                         </option>
                                     <option value="level1">Level 1 (120V)</option>
                                     <option value="level2">Level 2 (240V)</option>
                                     <option value="dcfast">DC Fast Charging</option>
@@ -680,6 +687,9 @@ const PopupForms = ({
                                     onChange={(e) => setSolarPanelData({ ...solarPanelData, Energy_Generation: e.target.value })}
                                     required
                                 >
+                                    <option value="" disabled hidden>
+            -- Select Energy Generation --
+        </option>
                                     <option value="Monthly">Monthly</option>
                                     <option value="Yearly">Yearly</option>
 
@@ -730,6 +740,9 @@ const PopupForms = ({
                                     onChange={(e) => setSolarPanelData({ ...solarPanelData, Inverter_Type: e.target.value })}
                                     required
                                 >
+                                    <option value="" disabled hidden>
+            -- Select Inverter Type --
+        </option>
                                     <option value="string">String Inverter</option>
                                     <option value="microinverter">Microinverter</option>
                                     <option value="hybrid">Hybrid Inverter</option>

@@ -1,0 +1,146 @@
+.engage-page {
+  padding: 150px 0 0 0;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f8f9fa;
+}
+.engage-title {
+  font-size: 2.2rem;
+  color: #1e8449;
+  margin-bottom: 32px;
+  font-weight: bold;
+}
+.engage-divs {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+.engage-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(30, 132, 73, 0.10);
+  padding: 36px 38px 28px 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  min-width: 160px;
+}
+.engage-card:hover {
+  box-shadow: 0 8px 32px rgba(30, 132, 73, 0.18);
+  transform: translateY(-4px) scale(1.04);
+}
+.engage-icon {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+}
+.engage-label {
+  font-size: 1.2rem;
+  color: #1e8449;
+  font-weight: 600;
+}
+/* --- Engage page icon iframe styling --- */
+.engage-img-iframe {
+  width: 54px;
+  height: 54px;
+  border: none;
+  background: none;
+  margin-bottom: 16px;
+  display: block;
+}
+/* --- Engage page large card and split layout --- */
+.engage-card-large {
+  width: 400px;
+  height: 320px;
+  box-shadow: 0 8px 32px rgba(2, 27, 12, 0.825), 0 2px 8px rgba(33, 67, 101, 0.556);
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  cursor: pointer;
+  background: #fff;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.engage-card-large:hover {
+  box-shadow: 0 16px 48px rgba(30, 132, 73, 0.22), 0 4px 16px rgba(44, 62, 80, 0.14);
+  transform: translateY(-6px) scale(1.04);
+}
+.engage-card-img {
+  flex: 1 1 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f8f6;
+  width: 100%;
+  height: 60%;
+  overflow: hidden;
+}
+.engage-img-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-bottom: 2px solid #e0e0e0;
+}
+.engage-label-large {
+  flex: 0 1 40%;
+  width: 100%;
+  text-align: center;
+  font-size: 1.4rem;
+  color: #1e8449;
+  font-weight: 700;
+  background: #fff;
+  padding: 22px 0 18px 0;
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
+  letter-spacing: 1px;
+}
+/* --- Engage page full image and smaller label --- */
+.engage-card-img-full {
+  flex: 1 1 80%;
+  width: 360px;
+  height: 80%;
+  padding: 0;
+  background: #f4f8f6;
+  overflow: hidden;
+ 
+}
+.engage-img-pic-full {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+ 
+  border-bottom: none;
+}
+.engage-label-small {
+  font-size: 1.08rem;
+  padding: 14px 0 10px 0;
+  font-weight: 600;
+  color:rgb(33, 95, 20)
+}
+/* Add description styling for Engage page cards */
+.engage-desc {
+  font-size: 0.92rem;
+  color: #494848;
+  margin-top: 4px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+}
+@media (max-width: 900px) {
+  .engage-divs {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .engage-card {
+    min-width: 220px;
+    width: 100%;
+  }
+  .engage-card-large {
+    width: 90vw;
+    max-width: 340px;
+    height: 260px;
+  }
+}

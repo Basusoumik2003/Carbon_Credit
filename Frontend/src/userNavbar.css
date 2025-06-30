@@ -1,0 +1,194 @@
+.user-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #0f4c75, #3282b8);
+  padding: 0.75rem 2rem;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.user-left-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.user-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-logo-icon {
+  color: #4caf50;
+  font-size: 1.5rem;
+}
+
+.user-logo-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.user-menu-icon {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: white;
+}
+
+.user-nav-links-center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-right-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-nav-item {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+}
+
+.user-nav-item:hover {
+  color: #ffd369;
+  transform: scale(1.05);
+}
+
+.active-link {
+  background-color: transparent;
+  border-radius: 0;
+}
+
+
+.user-nav-item svg {
+  font-size: 1.2rem;
+}
+
+/* Icon color classes */
+.icon.blue {
+  color: #4fc3f7;
+}
+.icon.purple {
+  color: #ba68c8;
+}
+.icon.orange {
+  color: #ffb74d;
+}
+.icon.teal {
+  color: #4db6ac;
+}
+.icon.gold {
+  color: #ffd54f;
+}
+.icon.gray {
+  color: #cfd8dc;
+}
+
+/* Streak badge */
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #ff7043, #ff5722);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.streak-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar dropdown styles (kept same) */
+.sidebar-dropdown {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background-color: white;
+  color: #333;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  width: 180px;
+  z-index: 999;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-item:hover {
+  background-color: #f3f4f6;
+}
+
+.sidebar-icon {
+  font-size: 1.1rem;
+}
+
+.sidebar-logout {
+  color: #e53935;
+}
+
+.sidebar-blue {
+  color: #42a5f5;
+}
+.sidebar-green {
+  color: #66bb6a;
+}
+.sidebar-purple {
+  color: #ab47bc;
+}
+.sidebar-yellow {
+  color: #ffca28;
+}
+.sidebar-red {
+  color: #e53935;
+}
+/* Profile icon style */
+.user-nav-item.profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1); /* subtle background */
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.user-nav-item.profile-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.user-nav-item.profile-icon svg {
+  font-size: 1.4rem;
+  color: #ffffff; /* consistent with navbar text */
+}
